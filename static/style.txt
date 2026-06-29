@@ -1,0 +1,297 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+/* Header */
+header {
+    background-color: #004080;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 10px 0;
+    font-size: 32px;
+    color: white;  /* FIXED: ensure white heading */
+}
+
+/* Nav Menu */
+header nav {
+    margin-top: 10px;
+}
+
+header nav a {
+    margin: 0 8px;
+    text-decoration: none;
+    padding: 8px 16px;
+    background: #007bff;
+    color: white;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: background 0.3s;
+}
+
+header nav a:hover {
+    background: #0056b3;
+}
+
+/* Dashboard cards */
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.class-card {
+    background: white;
+    margin-top: 30px;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 10px #aaa;
+    width: 80%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.class-info {
+    text-align: left;
+}
+
+.class-info h2 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.class-info p {
+    margin: 5px 0 0;
+    font-size: 16px;
+    color: #333;
+}
+
+.circle {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+.green {
+    background-color: green;
+}
+
+.red {
+    background-color: red;
+}
+
+/* Timetable */
+#timetable {
+    padding: 20px;
+    text-align: center;
+}
+
+#timetable h2 {
+    margin-bottom: 20px;
+    font-size: 28px;
+}
+
+.timetable-table {
+    margin: 20px auto;
+    border-collapse: collapse;
+    width: 90%;
+    background: white;
+    box-shadow: 0 0 10px #ccc;
+}
+
+.timetable-table th, .timetable-table td {
+    border: 1px solid #ddd;
+    padding: 14px 16px;
+    margin: 20px auto;
+    text-align: center;
+}
+
+.timetable-table th {
+    background-color: #004080;
+    color: white;
+    font-size: 18px;
+}
+
+.timetable-table td {
+    font-size: 14px;
+}
+
+
+.capture-container {
+      display: flex;
+      gap: 20px;
+      padding: 20px;
+    }
+    .video-box, .form-box {
+      flex: 1;
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    video {
+      width: 100%;
+      border-radius: 8px;
+    }
+    input, button {
+      display: block;
+      margin: 10px 0;
+      padding: 8px;
+      align-content: center;
+    }
+    .button-container {
+        display: flex;
+        justify-content: center; /* centers horizontally */
+        margin: 20px 0;
+    }
+    button {
+      cursor: pointer;
+      border: none;
+      background: #007BFF;
+      color: white;
+      border-radius: 6px;
+      padding: 10px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+
+
+
+
+/* =========================
+   Faculty Data Page Styles
+   ========================= */
+
+/* Main container */
+.faculty-container {
+    padding: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* Heading */
+.faculty-container h2 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: #004080;
+}
+
+/* Search bar */
+#searchInput {
+    width: 60%;
+    padding: 10px;
+    margin: 10px 0 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+/* Add Faculty button */
+.add-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-left: 10px;
+    background: #007bff;
+    color: white;
+    border-radius: 8px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.3s;
+    cursor: pointer;
+    border: none;
+}
+
+.add-btn:hover {
+    background: #0056b3;
+}
+
+/* Faculty Table */
+#facultyTable {
+    width: 75%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+#facultyTable th, #facultyTable td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+    font-size: 15px;
+}
+
+#facultyTable th {
+    background-color: #004080;
+    color: white;
+    font-size: 16px;
+}
+
+#facultyTable tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+#facultyTable tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Ensure all table cells align middle */
+.table td, .table th {
+  vertical-align: middle;
+  text-align: center;  /* optional, centers horizontally */
+}
+
+/* Center button inside the Actions column */
+.actions-cell {
+  display: flex;
+  justify-content: center;   /* horizontally center */
+  align-items: center;       /* vertically center */
+  height: 100%;              /* take full height of row */
+}
+
+
+.form-box {
+      display: flex;
+      justify-content: center;  /* Center horizontally */
+      align-items: center;      /* Center vertically */
+      flex-direction: column;   /* Stack items vertically */
+      text-align: left;       /* Center text */
+      padding: 20px;
+    }
+
+    .form-box form {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;                /* space between fields */
+      width: 100%;
+      max-width: 300px;         /* keeps inputs neat */
+    }
+
+    .form-box input, 
+    .form-box button {
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .form-box button {
+      background: #0066cc;
+      color: white;
+      cursor: pointer;
+    }
+
+    .form-box button:hover {
+      background: #0066cc;
+    }

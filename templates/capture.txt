@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}Capture Face{% endblock %}
+
+{% block content %}
+<div class="capture-page">
+  <div class="overlay">
+    <span class="top-close" onclick="closeCamera()">❌</span>
+    <h2>Capture Faculty Data</h2>
+    <div class="form-layout">
+
+      <!-- Left side: Camera / Preview -->
+      <div class="camera-container">
+        <video id="video" autoplay></video>
+        <canvas id="canvas" class="hidden"></canvas>
+      </div>
+
+      <!-- Right side: Input -->
+      <div class="form-inputs">
+        <label><strong>Faculty ID (short name):</strong></label>
+        <input type="text" id="facultyId" placeholder="e.g. divya" required>
+
+        <label><strong>Full Name:</strong></label>
+        <input type="text" id="fullName" placeholder="Enter full name" required>
+
+        <label><strong>Phone:</strong></label>
+        <input type="text" id="phone" placeholder="Enter phone" required>
+
+        <label><strong>Subject:</strong></label>
+        <input type="text" id="subject" placeholder="Enter subject" required>
+
+        <label><strong>Upload Profile Photo:</strong></label>
+        <input type="file" id="photoUpload" accept="image/*">
+
+        <div class="actions">
+          <button type="button" class="capture-btn" onclick="captureImage()">📸 Capture Image</button>
+          <button type="button" class="save-btn" onclick="saveData()">💾 Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    let video = document.getElementById('video');
+    let canvas = document.getElementById('canvas');
+    let context = canvas.getContext('2d');
+    let captured = false;
+
+    // Start webcam
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => { video.srcObject = stream; })
+        .catch(err => { alert("Camera access denied: " + err); });
+
+    function captureImage() {
+    // Draw video frame into canvas
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Hide video, show canvas in the same container
+    video.classList.add("hidden");
+    canvas.classList.remove("hidden");
+
+    captured = true;
+}
+
+
+    async function saveData() {
+        let facultyId = document.getElementById('facultyId').value.trim();
+        let fullName = document.getElementById('fullName').value.trim();
+        let phone = document.getElementById('phone').value.trim();
+        let subject = document.getElementById('subject').value.trim();
+        let fileInput = document.getElementById('photoUpload');
+
+        if (!facultyId || !fullName || !phone || !subject) {
+            alert("Please fill all fields!");
+            return;
+        }
+
+        if (!captured) {
+            alert("Please capture an image first!");
+            return;
+        }
+
+        // Captured webcam image → base64
+        let dataUrl = canvas.toDataURL("image/jpeg");
+
+        let formData = new FormData();
+        formData.append("facultyId", facultyId);
+        formData.append("fullName", fullName);
+        formData.append("phone", phone);
+        formData.append("subject", subject);
+        formData.append("capturedImg", dataUrl);
+
+        if (fileInput.files.length > 0) {
+            formData.append("uploadedPhoto", fileInput.files[0]);
+        }
+
+        fetch("/save_faculty", {
+            method: "POST",
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message);
+            window.location.href = "/";
+        })
+        .catch(err => alert("Error: " + err));
+    }
+
+    function closeCamera() {
+        if (video.srcObject) {
+            let tracks = video.srcObject.getTracks();
+            tracks.forEach(track => track.stop());
+        }
+        window.location.href = "/";
+    }
+</script>
+
+{% endblock %}
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Capture Faculty</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <img src="{{ url_for('static', filename='college logo.jpg') }}" alt="College Logo" height="90">
+    <!-- Navigation -->
+    <nav>
+      <a href="{{ url_for('dashboard') }}">Home</a>
+      <a href="{{ url_for('timetable') }}">Timetable</a>
+      <a href="{{ url_for('capture') }}">Capture</a>
+      <a href="{{ url_for('facultydata') }}">Faculty Data</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="capture-container">
+      <!-- Left side webcam -->
+      <div class="video-box">
+        <h3>Webcam Capture</h3>
+        <video id="video" autoplay></video>
+        <button id="captureBtn">Capture Face</button>
+        <canvas id="canvas" style="display:none;"></canvas>
+      </div>
+
+      <!-- Right side form -->
+      <div class="form-box">
+        <h3>Enter Faculty Details</h3>
+        <form method="POST" enctype="multipart/form-data">
+          <label for="Faculty ID">Faculty ID</label>
+          <input type="text" name="faculty_id" placeholder="Faculty ID" required>
+          <label for="Faculty Name">Faculty Name</label>
+          <input type="text" name="faculty_name" placeholder="Faculty Name" required>
+          <label for="Subject">Subject</label>
+          <input type="text" name="subject" placeholder="Subject" required>
+          <label for="Image">Upload Image</label>
+          <input type="file" name="faculty_image" accept="image/*">
+          <button type="submit">Save Details</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const captureBtn = document.getElementById('captureBtn');
+    const context = canvas.getContext('2d');
+
+    // Access webcam
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        video.srcObject = stream;
+      })
+      .catch(err => {
+        console.error("Error accessing webcam: ", err);
+      });
+
+    // Capture snapshot
+    captureBtn.addEventListener('click', () => {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataURL = canvas.toDataURL("image/png");
+
+      // Send captured image to server later if needed
+      console.log("Captured face:", dataURL);
+      alert("Face captured! (Integrate upload to server if required)");
+    });
+  </script>
+</body>
+</html>

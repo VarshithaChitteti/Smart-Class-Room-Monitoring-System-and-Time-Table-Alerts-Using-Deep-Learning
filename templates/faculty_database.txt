@@ -1,0 +1,383 @@
+{% extends "base.html" %}
+
+{% block title %}Faculty Data{% endblock %}
+
+{% block content %}
+<div class="faculty-data-container">
+    <div class="faculty-header">
+        <input type="text" id="searchBox" placeholder="Search by name, phone, or subject">
+        <button id="addFacultyBtn">Add New Faculty</button>
+        <button id="saveChangesBtn">Save Changes</button>
+    </div>
+
+    <table id="facultyTable">
+    <thead>
+        <tr>
+            <th>Faculty ID</th> <!-- New column -->
+            <th>Photo</th>
+            <th>Full Name</th>
+            <th>Mobile Number</th>
+            <th>Subject</th>
+            <th>Actions</th> <!-- For delete button -->
+        </tr>
+    </thead>
+    <tbody>
+        {% for fid, details in faculty.items() %}
+        <tr data-id="{{ fid }}">
+            <td><input type="text" value="{{ fid }}" class="editable" data-field="id" data-id="{{ fid }}"></td> <!-- ID input -->
+            <td>
+                <img src="{{ url_for('static', filename='faculty_photos/' ~ details.image) }}" class="faculty-photo" alt="photo">
+                <input type="file" class="photo-upload" data-id="{{ fid }}">
+            </td>
+            <td><input type="text" value="{{ details.name }}" class="editable" data-field="name" data-id="{{ fid }}"></td>
+            <td><input type="text" value="{{ details.phone }}" class="editable" data-field="phone" data-id="{{ fid }}"></td>
+            <td><input type="text" value="{{ details.subject }}" class="editable" data-field="subject" data-id="{{ fid }}"></td>
+            <td><button class="delete-btn" data-id="{{ fid }}">Delete</button></td> <!-- Delete button -->
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+    <p id="noFacultyMsg" style="display:none; text-align:center; margin-top:20px;">No faculty found.</p>
+</div>
+<!-- Add Faculty Modal -->
+<div id="addFacultyModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Add New Faculty</h2>
+        <form id="addFacultyForm" enctype="multipart/form-data">
+            <label for="newFacultyId"><strong>Faculty ID:</strong></label><br>
+            <input type="text" id="newFacultyId" placeholder="e.g. divya" required><br><br>
+
+            <label for="newFullName"><strong>Full Name:</strong></label><br>
+            <input type="text" id="newFullName" placeholder="Enter full name" required><br><br>
+
+            <label for="newPhone"><strong>Phone:</strong></label><br>
+            <input type="text" id="newPhone" placeholder="Enter phone number" required><br><br>
+
+            <label for="newSubject"><strong>Subject:</strong></label><br>
+            <input type="text" id="newSubject" placeholder="Enter subject" required><br><br>
+
+            <label for="newPhotoUpload"><strong>Upload Photo:</strong></label><br>
+            <input type="file" id="newPhotoUpload" accept="image/*"><br><br>
+
+            <button type="submit" class="view-btn">Add Faculty</button>
+        </form>
+    </div>
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const searchBox = document.getElementById("searchBox");
+    const tableBody = document.querySelector("#facultyTable tbody");
+    const noFacultyMsg = document.getElementById("noFacultyMsg");
+    const saveBtn = document.getElementById("saveChangesBtn");
+    const addBtn = document.getElementById("addFacultyBtn");
+
+    // --- Search Filter ---
+    searchBox.addEventListener("keyup", function() {
+        const filter = this.value.toLowerCase();
+        const rows = Array.from(tableBody.querySelectorAll("tr"));
+        let hasVisible = false;
+
+        rows.forEach(row => {
+            const name = row.querySelector('input[data-field="name"]').value.toLowerCase();
+            const phone = row.querySelector('input[data-field="phone"]').value.toLowerCase();
+            const subject = row.querySelector('input[data-field="subject"]').value.toLowerCase();
+
+            if (name.includes(filter) || phone.includes(filter) || subject.includes(filter)) {
+                row.style.display = "";
+                hasVisible = true;
+            } else {
+                row.style.display = "none";
+            }
+        });
+
+        noFacultyMsg.style.display = hasVisible ? "none" : "";
+    });
+
+    // --- Save Changes ---
+   saveBtn.addEventListener("click", function() {
+    const rows = Array.from(tableBody.querySelectorAll("tr"));
+    const requests = [];
+
+    rows.forEach(row => {
+        const idInput = row.querySelector('input[data-field="id"]');
+        const nameInput = row.querySelector('input[data-field="name"]');
+        const phoneInput = row.querySelector('input[data-field="phone"]');
+        const subjectInput = row.querySelector('input[data-field="subject"]');
+        const photoInput = row.querySelector('input.photo-upload');
+
+        const facultyId = idInput.value.trim();
+        if (!facultyId) return; // skip empty rows
+
+        const formData = new FormData();
+        formData.append("facultyId", facultyId);
+        formData.append("name", nameInput.value.trim());
+        formData.append("phone", phoneInput.value.trim());
+        formData.append("subject", subjectInput.value.trim());
+
+        if (photoInput && photoInput.files.length > 0) {
+            formData.append("uploadedPhoto", photoInput.files[0]);
+        }
+
+        // push the fetch promise
+        requests.push(
+            fetch("/update_faculty_database_with_photo", {
+                method: "POST",
+                body: formData
+            })
+            .then(res => {
+                if (!res.ok) throw new Error("Server error");
+                return res.json();
+            })
+        );
+    });
+
+    Promise.all(requests)
+        .then(results => {
+            console.log(results); // logs each success message
+            alert("✅ All changes saved successfully!");
+        })
+        .catch(err => {
+            console.error(err);
+            alert("❌ Error saving some changes. Check console for details.");
+        });
+});
+
+
+
+    // --- Delete Faculty ---
+    tableBody.addEventListener("click", function(e) {
+        if (e.target.classList.contains("delete-btn")) {
+            const fid = e.target.dataset.id;
+            if (confirm("Are you sure you want to delete this faculty?")) {
+                fetch("/delete_faculty", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ facultyId: fid })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    alert(data.message);
+                    e.target.closest("tr").remove();
+                });
+            }
+        }
+    });
+
+    // --- Add New Faculty ---
+    document.getElementById("addFacultyBtn").addEventListener("click", function() {
+    const tableBody = document.querySelector("#facultyTable tbody");
+
+    const newRow = document.createElement("tr");
+
+    newRow.innerHTML = `
+        <td><input type="text" class="editable" data-field="id" data-id=""></td> <!-- Faculty ID -->
+        <td>
+            <img src="{{ url_for('static', filename='faculty_photos/default.jpg') }}" class="faculty-photo" alt="photo">
+            <input type="file" class="photo-upload">
+        </td>
+        <td><input type="text" class="editable" data-field="name" data-id=""></td> <!-- Name -->
+        <td><input type="text" class="editable" data-field="phone" data-id=""></td> <!-- Phone -->
+        <td><input type="text" class="editable" data-field="subject" data-id=""></td> <!-- Subject -->
+        <td><button class="delete-btn">Delete</button></td> <!-- Actions -->
+    `;
+
+    tableBody.appendChild(newRow);
+});
+
+});
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Faculty Data</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script>
+    function searchFaculty() {
+      let input = document.getElementById("searchInput").value.toLowerCase();
+      let table = document.getElementById("facultyTable");
+      let rows = table.getElementsByTagName("tr");
+
+      for (let i = 1; i < rows.length; i++) {
+        let cells = rows[i].getElementsByTagName("td");
+        let match = false;
+
+        for (let j = 0; j < cells.length; j++) {
+          if (cells[j].innerText.toLowerCase().includes(input)) {
+            match = true;
+            break;
+          }
+        }
+        rows[i].style.display = match ? "" : "none";
+      }
+    }
+  </script>
+</head>
+<body>
+  <header>
+    <img src="{{ url_for('static', filename='college logo.jpg') }}" alt="College Logo" height="90">
+    <!-- Navigation -->
+    <nav>
+      <a href="{{ url_for('dashboard') }}">Home</a>
+      <a href="{{ url_for('timetable') }}">Timetable</a>
+      <a href="{{ url_for('capture') }}">Capture</a>
+      <a href="{{ url_for('facultydata') }}">Faculty Data</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Faculty Data</h2>
+    <input type="text" id="searchInput" onkeyup="searchFaculty()" placeholder="Search by ID, Name or Subject">
+    <button onclick="goToCapture()">+ Add Faculty</button>
+
+  <script>
+    function goToCapture() {
+      window.location.href = "{{ url_for('capture') }}";
+    }
+  </script>
+
+
+
+    <table id="facultyTable" border="1" cellpadding="10" cellspacing="0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Image</th>
+          <th>Name</th>
+          <th>Subject</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in faculty_list %}
+        <tr>
+          <td>{{ f.faculty_id }}</td>
+          <td>
+            {% if f.image %}
+              <img src="{{ f.image }}" width="80">
+            {% else %}
+              No Image
+            {% endif %}
+          </td>
+          <td>{{ f.faculty_name }}</td>
+          <td>{{ f.subject }}</td>
+          <td>
+            <form method="POST" action="{{ url_for('delete_faculty', faculty_id=f.faculty_id) }}" style="display:inline;">
+              <button type="submit" onclick="return confirm('Delete this faculty?');">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </main>
+</body>
+</html>
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Faculty Data</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script>
+    function searchFaculty() {
+      let input = document.getElementById("searchInput").value.toLowerCase();
+      let table = document.getElementById("facultyTable");
+      let rows = table.getElementsByTagName("tr");
+
+      for (let i = 1; i < rows.length; i++) {
+        let cells = rows[i].getElementsByTagName("td");
+        let match = false;
+
+        for (let j = 0; j < cells.length; j++) {
+          if (cells[j].innerText.toLowerCase().includes(input)) {
+            match = true;
+            break;
+          }
+        }
+        rows[i].style.display = match ? "" : "none";
+      }
+    }
+
+    function goToCapture() {
+      window.location.href = "{{ url_for('capture') }}";
+    }
+  </script>
+</head>
+<body>
+  <header>
+    <img src="{{ url_for('static', filename='college logo.jpg') }}" alt="College Logo" height="90">
+    <!-- Navigation -->
+    <nav>
+      <a href="{{ url_for('dashboard') }}">Home</a>
+      <a href="{{ url_for('timetable') }}">Timetable</a>
+      <a href="{{ url_for('capture') }}">Capture</a>
+      <a href="{{ url_for('facultydata') }}">Faculty Data</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Faculty Data</h2>
+    <input type="text" id="searchInput" onkeyup="searchFaculty()" placeholder="Search by ID, Name, Subject, or Mobile">
+    <button onclick="goToCapture()">+ Add Faculty</button>
+
+    <table id="facultyTable" border="1" cellpadding="10" cellspacing="0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Image</th>
+          <th>Name</th>
+          <th>Subject</th>
+          <th>Mobile</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in faculty_list %}
+        <tr>
+          <td>{{ f.faculty_id }}</td>
+          <td>
+            {% if f.image %}
+              <img src="{{ f.image }}" width="80">
+            {% else %}
+              No Image
+            {% endif %}
+          </td>
+          <td>{{ f.faculty_name }}</td>
+          <td>{{ f.subject }}</td>
+          <td>{{ f.mobile }}</td>
+          <td>
+            <!-- Edit Button -->
+            <form method="GET" action="{{ url_for('edit_faculty', faculty_id=f.faculty_id) }}" style="display:inline;">
+              <button type="submit">Edit</button>
+            </form>
+            <!-- Delete Button -->
+            <form method="POST" action="{{ url_for('delete_faculty', faculty_id=f.faculty_id) }}" style="display:inline;">
+              <button type="submit" onclick="return confirm('Delete this faculty?');">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </main>
+</body>
+</html>

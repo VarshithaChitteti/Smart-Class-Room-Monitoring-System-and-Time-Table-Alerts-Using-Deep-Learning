@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Smart Classroom Monitoring</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <img src="{{ url_for('static', filename='college logo.jpg') }}" alt="College Logo" height="90">
+    
+    <!-- Navigation -->
+    <nav>
+      <a href="{{ url_for('dashboard') }}">Home</a>
+      <a href="{{ url_for('timetable') }}">Timetable</a>
+      <a href="{{ url_for('capture') }}">Capture</a>
+      <a href="{{ url_for('facultydata') }}">Faculty Data</a>
+    </nav>
+  </header>
+
+  <!-- Timetable Content -->
+  <section id="timetable">
+    <h2>WEEKLY TIMETABLE</h2>
+    <div id="timetable-container"></div>
+    <button onclick="saveTimetable()">Save Changes</button>
+  </section>
+
+  <script>
+    const daysOrder = [
+      "Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"
+    ];
+
+    // Load timetable.json
+    async function loadTimetable() {
+      const res = await fetch('/get_timetable');
+      const data = await res.json();
+      renderTimetable(data);
+    }
+
+    function renderTimetable(data) {
+      const container = document.getElementById('timetable-container');
+      container.innerHTML = '';
+
+      daysOrder.forEach(day => {
+        if (data[day]) {
+          const table = document.createElement('table');
+          table.classList.add('timetable-table');
+          let html = `<tr><th colspan="5">${day}</th></tr>
+                      <tr><th>Faculty</th><th>Subject</th><th>Start</th><th>End</th><th>Phone</th></tr>`;
+          data[day].forEach((row, i) => {
+            html += `<tr>
+              <td contenteditable="true" class="edit-cell" data-day="${day}" data-index="${i}" data-field="faculty_name">${row.faculty_name}</td>
+              <td contenteditable="true" class="edit-cell" data-day="${day}" data-index="${i}" data-field="subject">${row.subject}</td>
+              <td contenteditable="true" class="edit-cell" data-day="${day}" data-index="${i}" data-field="start_time">${row.start_time}</td>
+              <td contenteditable="true" class="edit-cell" data-day="${day}" data-index="${i}" data-field="end_time">${row.end_time}</td>
+              <td contenteditable="true" class="edit-cell" data-day="${day}" data-index="${i}" data-field="phone">${row.phone}</td>
+            </tr>`;
+          });
+          table.innerHTML = html;
+          container.appendChild(table);
+        }
+      });
+    }
+
+    async function saveTimetable() {
+      const cells = document.querySelectorAll('#timetable-container td.edit-cell');
+      const updatedData = {};
+      cells.forEach(cell => {
+        const day = cell.dataset.day;
+        const index = cell.dataset.index;
+        const field = cell.dataset.field;
+        if (!updatedData[day]) updatedData[day] = {};
+        if (!updatedData[day][index]) updatedData[day][index] = {};
+        updatedData[day][index][field] = cell.innerText;
+      });
+      await fetch('/save_timetable', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedData)
+      });
+      alert('Timetable saved!');
+    }
+
+    loadTimetable();
+  </script>
+</body>
+</html>

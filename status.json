@@ -1,0 +1,20 @@
+[
+    {
+        "room": "CSE-A",
+        "status": "Absent",
+        "faculty": "",
+        "entry_time": "28-03-2026 12:26:22"
+    },
+    {
+        "room": "CSE-B",
+        "status": "Absent",
+        "faculty": "",
+        "entry_time": ""
+    },
+    {
+        "room": "CSE-C",
+        "status": "Absent",
+        "faculty": "",
+        "entry_time": ""
+    }
+]

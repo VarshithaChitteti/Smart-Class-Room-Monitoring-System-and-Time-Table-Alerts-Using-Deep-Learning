@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Smart Classroom Monitoring{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <img src="{{ url_for('static', filename='college logo.jpg') }}" 
+             alt="College Logo" height="100" width="60%">
+        <nav class="navbar">
+            <ul>
+    {% if session['role'] == 'admin' %}
+        <li><a href="{{ url_for('dashboard') }}">Home</a></li>
+        <li><a href="{{ url_for('timetable') }}">Edit Timetable</a></li>
+        <li><a href="{{ url_for('capture') }}">Capture Face</a></li>
+        <li><a href="{{ url_for('faculty_database') }}">Faculty Data</a></li>
+        <li><a href="{{ url_for('faculty_report') }}">View Report</a></li>
+    {% elif session['role'] == 'faculty' %}
+        <li><a href="{{ url_for('faculty_report') }}">My Report</a></li>
+    {% endif %}
+
+    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+</ul>
+
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

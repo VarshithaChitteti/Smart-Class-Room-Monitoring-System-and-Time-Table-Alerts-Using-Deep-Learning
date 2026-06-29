@@ -1,0 +1,674 @@
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from werkzeug.utils import secure_filename
+import json
+import base64
+import os
+
+app = Flask(__name__)
+app.secret_key = "your_secret_key_here"
+
+STATUS_FILE = "status.json"
+FACULTY_FILE = "faculty_data.json"
+TIMETABLE_FILE = "timetable.json"
+PHOTOS_FOLDER = "static/faculty_photos"
+
+
+# Reset status when app starts
+def reset_status():
+    if os.path.exists(STATUS_FILE):
+        with open(STATUS_FILE, "r") as f:
+            current = json.load(f)
+    else:
+        current = [
+            {"room": "CSE-A", "status": "Absent", "faculty": ""},
+            {"room": "CSE-B", "status": "Absent", "faculty": ""},
+            {"room": "CSE-C", "status": "Absent", "faculty": ""}
+        ]
+
+    for room in current:
+        room["status"] = "Absent"
+        room["faculty"] = ""
+
+    with open(STATUS_FILE, "w") as f:
+        json.dump(current, f, indent=4)
+
+
+reset_status()
+
+
+def load_class_status():
+    if os.path.exists(STATUS_FILE):
+        with open(STATUS_FILE, "r") as f:
+            return json.load(f)
+    return []
+
+
+def load_faculty_data():
+    if os.path.exists(FACULTY_FILE):
+        with open(FACULTY_FILE, "r") as f:
+            return json.load(f)
+    return {}
+
+
+def enrich_class_status(classrooms, faculty_data):
+    for room in classrooms:
+        faculty_id = room.get("faculty", "")
+
+        if faculty_id and faculty_id in faculty_data:
+            details = faculty_data[faculty_id]
+            room["name"] = details["name"]
+            room["phone"] = details["phone"]
+            room["subject"] = details["subject"]
+
+            # Photo path
+            photo_filename = details["image"]
+            photo_path = os.path.join(PHOTOS_FOLDER, photo_filename)
+            if os.path.exists(photo_path):
+                room["photo"] = f"/{PHOTOS_FOLDER}/{photo_filename}"
+            else:
+                room["photo"] = f"/{PHOTOS_FOLDER}/default.jpg"
+        else:
+            room["name"] = ""
+            room["phone"] = ""
+            room["subject"] = ""
+            room["photo"] = f"/{PHOTOS_FOLDER}/default.jpg"
+
+    return classrooms
+
+
+# --- Timetable Helpers ---
+def load_timetable():
+    if os.path.exists(TIMETABLE_FILE):
+        with open(TIMETABLE_FILE, "r") as f:
+            return json.load(f)
+    return {}
+
+def save_timetable(data):
+    with open(TIMETABLE_FILE, "w") as f:
+        json.dump(data, f, indent=4)
+
+
+# --- Routes ---
+@app.route("/")
+def dashboard():
+    classrooms = load_class_status()
+    faculty_data = load_faculty_data()
+    classrooms = enrich_class_status(classrooms, faculty_data)
+    return render_template("dashboard.html", classrooms=classrooms)
+
+
+@app.route("/timetable", methods=["GET"])
+def timetable():
+    data = load_timetable()
+    return render_template("timetable.html", timetable=data)
+
+
+@app.route("/save_timetable", methods=["POST"])
+def save_timetable_route():
+    data = load_timetable()
+    new_data = {}
+
+    for day, sessions in data.items():
+        new_sessions = []
+        for idx in range(len(sessions)):
+            faculty = request.form.get(f"{day}-{idx}-faculty")
+            subject = request.form.get(f"{day}-{idx}-subject")
+            start = request.form.get(f"{day}-{idx}-start")
+            end = request.form.get(f"{day}-{idx}-end")
+            phone = request.form.get(f"{day}-{idx}-phone")
+
+            new_sessions.append({
+                "faculty_name": faculty,
+                "subject": subject,
+                "start_time": start,
+                "end_time": end,
+                "phone": phone
+            })
+        new_data[day] = new_sessions
+
+    save_timetable(new_data)
+    flash("Timetable updated successfully!")  
+    return redirect(url_for("timetable"))
+
+
+@app.route("/capture")
+def capture():
+    return render_template("capture.html")
+
+
+@app.route("/faculty_data")
+def faculty_data():
+    return render_template("faculty_data.html")
+
+
+@app.route("/save_faculty", methods=["POST"])
+def save_faculty():
+    faculty_id = request.form.get("facultyId", "").strip()
+    full_name = request.form.get("fullName", "").strip()
+    phone = request.form.get("phone", "").strip()
+    subject = request.form.get("subject", "").strip()
+    captured_img = request.form.get("capturedImg")
+
+    if not faculty_id:
+        return jsonify({"message": "Faculty ID is required"}), 400
+
+    if captured_img:
+        img_data = captured_img.split(",")[1]
+        known_path = os.path.join("known_faces", f"{faculty_id}.png")
+        with open(known_path, "wb") as f:
+            f.write(base64.b64decode(img_data))
+            
+    filename = f"{faculty_id}.jpg"
+    photo_path = os.path.join(PHOTOS_FOLDER, filename)
+
+    # --- Case 1: Captured webcam image ---
+    if captured_img and captured_img.startswith("data:image"):
+        try:
+            img_data = captured_img.split(",")[1]
+            with open(photo_path, "wb") as f:
+                f.write(base64.b64decode(img_data))
+        except Exception as e:
+            return jsonify({"message": f"Error saving captured image: {str(e)}"}), 500
+
+    # --- Case 2: Uploaded file ---
+    uploaded_file = request.files.get("uploadedPhoto")
+    if uploaded_file and uploaded_file.filename != "":
+        uploaded_file.save(photo_path)
+
+    # --- Update JSON ---
+    faculty_data = load_faculty_data()
+    faculty_data[faculty_id] = {
+        "name": full_name,
+        "phone": phone,
+        "subject": subject,
+        "image": filename if os.path.exists(photo_path) else "default.jpg"
+    }
+
+    with open(FACULTY_FILE, "w") as f:
+        json.dump(faculty_data, f, indent=4)
+
+    return jsonify({"message": f"Faculty {full_name} saved successfully!"})
+
+
+
+
+
+FACULTY_FILE = "faculty_data.json"
+PHOTOS_FOLDER = "static/faculty_photos"
+os.makedirs(PHOTOS_FOLDER, exist_ok=True)
+
+@app.route("/faculty_database")
+def faculty_database():
+    if os.path.exists(FACULTY_FILE):
+        with open(FACULTY_FILE, "r") as f:
+            faculty = json.load(f)
+    else:
+        faculty = {}
+    return render_template("faculty_database.html", faculty=faculty)
+
+@app.route("/add_faculty", methods=["POST"])
+def add_faculty():
+    faculty_id = request.form.get("facultyId").strip()
+    full_name = request.form.get("fullName").strip()
+    phone = request.form.get("phone").strip()
+    subject = request.form.get("subject").strip()
+    uploaded_file = request.files.get("uploadedPhoto")
+
+    if not faculty_id:
+        return jsonify({"message": "Faculty ID is required"}), 400
+
+    # Save uploaded photo as <faculty_id>.jpg
+    if uploaded_file:
+        filename = secure_filename(f"{faculty_id}.jpg")
+        upload_path = os.path.join(PHOTOS_FOLDER, filename)
+        uploaded_file.save(upload_path)   # ← This line saves the file
+    else:
+        filename = "default.jpg"
+
+    # Save to faculty_data.json
+    faculty_data = load_faculty_data()
+    faculty_data[faculty_id] = {
+        "name": full_name,
+        "phone": phone,
+        "subject": subject,
+        "image": filename
+    }
+
+    with open(FACULTY_FILE, "w") as f:
+        json.dump(faculty_data, f, indent=4)
+
+    return jsonify({"message": f"Faculty {full_name} added successfully!"})
+
+
+
+@app.route("/delete_faculty", methods=["POST"])
+def delete_faculty():
+    data = request.get_json()
+    faculty_id = data.get("facultyId")
+    if not faculty_id:
+        return jsonify({"message": "Faculty ID required"}), 400
+
+    faculty_data = load_faculty_data()
+    if faculty_id in faculty_data:
+        # Delete photo
+        photo_path = os.path.join(PHOTOS_FOLDER, faculty_data[faculty_id]["image"])
+        if os.path.exists(photo_path) and faculty_data[faculty_id]["image"] != "default.jpg":
+            os.remove(photo_path)
+        # Delete from JSON
+        del faculty_data[faculty_id]
+        with open(FACULTY_FILE, "w") as f:
+            json.dump(faculty_data, f, indent=4)
+        return jsonify({"message": f"Faculty {faculty_id} deleted successfully!"})
+    else:
+        return jsonify({"message": "Faculty not found"}), 404
+
+@app.route("/update_faculty_database_with_photo", methods=["POST"])
+def update_faculty_database_with_photo():
+    faculty_data = load_faculty_data()
+
+    faculty_id = request.form.get("facultyId")
+    if not faculty_id:   # ✅ validation here
+        return jsonify({"message": "Faculty ID missing"}), 400
+    
+    
+    faculty_id = request.form.get("facultyId").strip()
+    name = request.form.get("name").strip()
+    phone = request.form.get("phone").strip()
+    subject = request.form.get("subject").strip()
+    uploaded_file = request.files.get("uploadedPhoto")
+
+    if uploaded_file and uploaded_file.filename != "":
+        filename = secure_filename(f"{faculty_id}.jpg")
+        uploaded_file.save(os.path.join(PHOTOS_FOLDER, filename))
+    else:
+        filename = faculty_data.get(faculty_id, {}).get("image", "default.jpg")
+
+
+    # Update JSON
+    faculty_data[faculty_id] = {
+        "name": name,
+        "phone": phone,
+        "subject": subject,
+        "image": filename
+    }
+
+    with open(FACULTY_FILE, "w") as f:
+        json.dump(faculty_data, f, indent=4)
+
+    return jsonify({"message": f"Faculty {name} updated successfully!"})
+
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
+
+
+
+
+
+#WITH UPDATION OF FACULTY DATABASE
+
+from flask import Flask, render_template, jsonify, request, redirect, url_for
+import json
+import os
+from werkzeug.utils import secure_filename
+
+app = Flask(__name__)
+
+UPLOAD_FOLDER = os.path.join("static", "known_faces")
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+FACULTY_FILE = "faculty.json"
+
+
+# ----------------- Utility: Faculty Data -----------------
+def load_faculty():
+    if os.path.exists(FACULTY_FILE):
+        with open(FACULTY_FILE, "r") as f:
+            return json.load(f)
+    return []
+
+def save_faculty(data):
+    with open(FACULTY_FILE, "w") as f:
+        json.dump(data, f, indent=4)
+
+
+# ----------------- Status Reset on Start -----------------
+def reset_status():
+    if os.path.exists("status.json"):
+        with open("status.json", "r") as f:
+            current = json.load(f)
+
+        for room in current:
+            room["status"] = "Absent"
+            room["faculty"] = ""
+
+        with open("status.json", "w") as f:
+            json.dump(current, f, indent=4)
+
+reset_status()
+
+
+# ----------------- Load classroom statuses -----------------
+def load_class_status():
+    if os.path.exists("status.json"):
+        with open("status.json", "r") as f:
+            return json.load(f)
+    else:
+        return [
+            {"room": "CSE-A", "status": "Absent", "faculty": ""},
+            {"room": "CSE-B", "status": "Absent", "faculty": ""},
+            {"room": "CSE-C", "status": "Absent", "faculty": ""}
+        ]
+
+
+# ----------------- Routes -----------------
+
+# Redirect root to /dashboard
+@app.route("/")
+def home():
+    return redirect("/dashboard")
+
+# Dashboard route
+@app.route("/dashboard")
+def dashboard():
+    classrooms = load_class_status()
+    return render_template("dashboard.html", classrooms=classrooms)
+
+# Timetable route
+@app.route("/timetable")
+def timetable():
+    return render_template("timetable.html")
+
+# API: Get timetable data
+@app.route("/get_timetable")
+def get_timetable():
+    if not os.path.exists("timetable.json"):
+        return jsonify({})
+    with open("timetable.json") as f:
+        data = json.load(f)
+    return jsonify(data)
+
+# API: Save timetable changes
+@app.route("/save_timetable", methods=["POST"])
+def save_timetable():
+    updates = request.json
+
+    if not os.path.exists("timetable.json"):
+        return jsonify({"error": "timetable.json not found"}), 404
+
+    with open("timetable.json") as f:
+        timetable = json.load(f)
+
+    # Apply updates
+    for day, rows in updates.items():
+        for index, fields in rows.items():
+            for field, value in fields.items():
+                timetable[day][int(index)][field] = value
+
+    with open("timetable.json", "w") as f:
+        json.dump(timetable, f, indent=2)
+
+    return jsonify({"status": "success"})
+
+
+# ----------------- Faculty Data -----------------
+
+# Capture new faculty details
+@app.route("/capture", methods=["GET", "POST"])
+def capture():
+    if request.method == "POST":
+        faculty_id = request.form["faculty_id"]
+        faculty_name = request.form["faculty_name"]
+        subject = request.form["subject"]
+        mobile = request.form["mobile"]
+        image = request.files.get("faculty_image")
+
+        filename = None
+        if image and image.filename != "":
+            os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+            filename = os.path.join(UPLOAD_FOLDER, secure_filename(f"{faculty_id}_{image.filename}"))
+            image.save(filename)
+
+        data = load_faculty()
+        data.append({
+            "faculty_id": faculty_id,
+            "faculty_name": faculty_name,
+            "subject": subject,
+            "mobile": mobile,
+            "image": filename
+        })
+        save_faculty(data)
+
+        return redirect(url_for("facultydata"))
+
+    return render_template("capture.html")
+
+
+# Faculty Data page
+@app.route("/facultydata")
+def facultydata():
+    data = load_faculty()
+    return render_template("facultydata.html", faculty_list=data)
+
+
+# Delete Faculty
+@app.route("/delete/<faculty_id>", methods=["POST"])
+def delete_faculty(faculty_id):
+    data = load_faculty()
+    updated = [f for f in data if f["faculty_id"] != faculty_id]
+    save_faculty(updated)
+    return redirect(url_for("facultydata"))
+
+
+# Edit Faculty
+@app.route("/edit/<faculty_id>", methods=["GET", "POST"])
+def edit_faculty(faculty_id):
+    data = load_faculty()
+    faculty = next((f for f in data if f["faculty_id"] == faculty_id), None)
+
+    if not faculty:
+        return "Faculty not found", 404
+
+    if request.method == "POST":
+        faculty["faculty_name"] = request.form["faculty_name"]
+        faculty["subject"] = request.form["subject"]
+        faculty["mobile"] = request.form["mobile"]
+
+        image = request.files.get("faculty_image")
+        if image and image.filename != "":
+            filename = os.path.join(UPLOAD_FOLDER, secure_filename(f"{faculty_id}_{image.filename}"))
+            image.save(filename)
+            faculty["image"] = filename
+
+        save_faculty(data)
+        return redirect(url_for("facultydata"))
+
+    return render_template("edit_faculty.html", faculty=faculty)
+
+
+# Update Faculty inline
+@app.route("/update_faculty/<faculty_id>", methods=["POST"])
+def update_faculty(faculty_id):
+    data = load_faculty()
+    faculty = next((f for f in data if f["faculty_id"] == faculty_id), None)
+
+    if not faculty:
+        return jsonify({"error": "Faculty not found"}), 404
+
+    update_data = request.json
+    faculty["faculty_name"] = update_data.get("faculty_name", faculty["faculty_name"])
+    faculty["subject"] = update_data.get("subject", faculty["subject"])
+    faculty["mobile"] = update_data.get("mobile", faculty.get("mobile", ""))
+
+    save_faculty(data)
+    return jsonify({"status": "success"})
+
+
+# ----------------- Run App -----------------
+if __name__ == "__main__":
+    app.run(debug=True)
+
+
+
+
+
+#WITHOUT UPDATION
+
+from flask import Flask, render_template, jsonify, request, redirect, url_for
+import json
+import os
+from werkzeug.utils import secure_filename
+
+app = Flask(__name__)
+
+UPLOAD_FOLDER = os.path.join("static", "known_faces")
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+FACULTY_FILE = "faculty.json"
+
+
+# ----------------- Utility: Faculty Data -----------------
+def load_faculty():
+    if os.path.exists(FACULTY_FILE):
+        with open(FACULTY_FILE, "r") as f:
+            return json.load(f)
+    return []
+
+def save_faculty(data):
+    with open(FACULTY_FILE, "w") as f:
+        json.dump(data, f, indent=4)
+
+
+# ----------------- Status Reset on Start -----------------
+def reset_status():
+    if os.path.exists("status.json"):
+        with open("status.json", "r") as f:
+            current = json.load(f)
+
+        for room in current:
+            room["status"] = "Absent"
+            room["faculty"] = ""
+
+        with open("status.json", "w") as f:
+            json.dump(current, f, indent=4)
+
+reset_status()
+
+
+# ----------------- Load classroom statuses -----------------
+def load_class_status():
+    if os.path.exists("status.json"):
+        with open("status.json", "r") as f:
+            return json.load(f)
+    else:
+        return [
+            {"room": "CSE-A", "status": "Absent", "faculty": ""},
+            {"room": "CSE-B", "status": "Absent", "faculty": ""},
+            {"room": "CSE-C", "status": "Absent", "faculty": ""}
+        ]
+
+
+# ----------------- Routes -----------------
+
+# Redirect root to /dashboard
+@app.route("/")
+def home():
+    return redirect("/dashboard")
+
+# Dashboard route
+@app.route("/dashboard")
+def dashboard():
+    classrooms = load_class_status()
+    return render_template("dashboard.html", classrooms=classrooms)
+
+# Timetable route
+@app.route("/timetable")
+def timetable():
+    return render_template("timetable.html")
+
+# API: Get timetable data
+@app.route("/get_timetable")
+def get_timetable():
+    if not os.path.exists("timetable.json"):
+        return jsonify({})
+    with open("timetable.json") as f:
+        data = json.load(f)
+    return jsonify(data)
+
+# API: Save timetable changes
+@app.route("/save_timetable", methods=["POST"])
+def save_timetable():
+    updates = request.json
+
+    if not os.path.exists("timetable.json"):
+        return jsonify({"error": "timetable.json not found"}), 404
+
+    with open("timetable.json") as f:
+        timetable = json.load(f)
+
+    # Apply updates
+    for day, rows in updates.items():
+        for index, fields in rows.items():
+            for field, value in fields.items():
+                timetable[day][int(index)][field] = value
+
+    with open("timetable.json", "w") as f:
+        json.dump(timetable, f, indent=2)
+
+    return jsonify({"status": "success"})
+
+
+# ----------------- Faculty Data -----------------
+
+# Capture new faculty details
+@app.route("/capture", methods=["GET", "POST"])
+def capture():
+    if request.method == "POST":
+        faculty_id = request.form["faculty_id"]
+        faculty_name = request.form["faculty_name"]
+        subject = request.form["subject"]
+        image = request.files.get("faculty_image")
+
+        filename = None
+        if image and image.filename != "":
+            os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+            filename = os.path.join(UPLOAD_FOLDER, secure_filename(f"{faculty_id}_{image.filename}"))
+            image.save(filename)
+
+        data = load_faculty()
+        data.append({
+            "faculty_id": faculty_id,
+            "faculty_name": faculty_name,
+            "subject": subject,
+            "image": filename
+        })
+        save_faculty(data)
+
+        return redirect(url_for("facultydata"))
+
+    return render_template("capture.html")
+
+
+# Faculty Data page
+@app.route("/facultydata")
+def facultydata():
+    data = load_faculty()
+    return render_template("facultydata.html", faculty_list=data)
+
+
+# Delete Faculty
+@app.route("/delete/<faculty_id>", methods=["POST"])
+def delete_faculty(faculty_id):
+    data = load_faculty()
+    updated = [f for f in data if f["faculty_id"] != faculty_id]
+    save_faculty(updated)
+    return redirect(url_for("facultydata"))
+
+
+# ----------------- Run App -----------------
+if __name__ == "__main__":
+    app.run(debug=True)
+
+

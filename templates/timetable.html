@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Timetable{% endblock %}
+
+{% block content %}
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <script>alert("{{ messages[0] }}");</script>
+      {% endif %}
+    {% endwith %}
+
+    <h1>Weekly Timetable</h1>
+    <form method="POST" action="{{ url_for('save_timetable_route') }}">
+        {% for day, sessions in timetable.items() %}
+        <h2>{{ day }}</h2>
+        <table border="1" cellpadding="8" cellspacing="0" class="timetable-table">
+            <tr>
+                <th>Faculty</th>
+                <th>Subject</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Phone</th>
+            </tr>
+            {% for session in sessions %}
+            <tr>
+                <td><input type="text" name="{{ day }}-{{ loop.index0 }}-faculty" value="{{ session.faculty_name }}"></td>
+                <td><input type="text" name="{{ day }}-{{ loop.index0 }}-subject" value="{{ session.subject }}"></td>
+                <td><input type="text" name="{{ day }}-{{ loop.index0 }}-start" value="{{ session.start_time }}"></td>
+                <td><input type="text" name="{{ day }}-{{ loop.index0 }}-end" value="{{ session.end_time }}"></td>
+                <td><input type="text" name="{{ day }}-{{ loop.index0 }}-phone" value="{{ session.phone }}"></td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endfor %}
+        <br>
+        <div class="button-container">
+            <button type="submit" class="view-btn">Save Changes</button>
+        </div>
+    </form>
+{% endblock %}

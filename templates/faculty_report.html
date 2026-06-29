@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Faculty Attendance Report{% endblock %}
+
+{% block content %}
+
+<style>
+    body {
+        font-family: Arial;
+        text-align: center;
+    }
+
+    table {
+        margin: 30px auto;
+        border-collapse: collapse;
+        width: 80%;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 10px;
+    }
+
+    th {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .chart-box {
+        width: 60%;
+        margin: 40px auto;
+    }
+</style>
+
+<h2>📊 Faculty Attendance Report</h2>
+
+<table>
+    <tr>
+        <th>Faculty Name</th>
+        <th>Total Classes</th>
+        <th>Attended</th>
+        <th>Attendance %</th>
+    </tr>
+
+    {% for name, data in report.items() %}
+    <tr>
+        <td>{{ name }}</td>
+        <td>{{ data.total }}</td>
+        <td>{{ data.attended }}</td>
+        <td>{{ data.percentage }}%</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<div class="chart-box">
+    <canvas id="chart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const labels = {{ chart_labels | safe }};
+const data = {{ chart_data | safe }};
+
+    const ctx = document.getElementById('chart').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Attendance %',
+                data: data
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+</script>
+
+{% endblock %}

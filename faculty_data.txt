@@ -1,0 +1,23 @@
+[
+    {
+        "faculty_id": "512",
+        "faculty_name": "CHITTETI VARSHITHA",
+        "subject": "MAD",
+        "mobile": "9121719014",
+        "image": "static\\known_faces\\512_Varshitha_Image.jpg"
+    },
+    {
+        "faculty_id": "541",
+        "faculty_name": "PATAN JASMINE",
+        "subject": "OOAD",
+        "mobile": "201562",
+        "image": "static\\known_faces\\541_VarshiImage.jpg"
+    },
+    {
+        "faculty_id": "516",
+        "faculty_name": "tejaswini",
+        "subject": "OOAD",
+        "mobile": "201562",
+        "image": "static\\known_faces\\varshi.jpg"
+    }
+]

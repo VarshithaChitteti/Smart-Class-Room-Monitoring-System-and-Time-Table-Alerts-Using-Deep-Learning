@@ -1,0 +1,496 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #004080;
+    color: white;
+    padding: 30px;
+    text-align: center;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.class-card {
+    background: white;
+    margin: 20px auto;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 10px #aaa;
+    width: 80%;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+}
+
+.class-info {
+    justify-self: start;
+}
+
+.class-info h2 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.class-info p {
+    margin: 5px 0 0;
+    font-size: 16px;
+    color: #333;
+}
+
+.circle {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    justify-self: end;
+}
+
+.green {
+    background-color: green;
+}
+
+.red {
+    background-color: red;
+}
+
+.class-actions {
+    justify-self: center;
+}
+
+.view-btn {
+    white-space: nowrap;
+    padding: 10px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background 0.3s;
+    text-align: center;
+}
+
+.button-container {
+    text-align: center; /* center inline/block elements horizontally */
+    margin-top: 5px;
+    margin-bottom: 40px;   /* optional spacing above */
+}
+
+
+.view-btn:hover {
+    background-color: #0056b3;
+}
+
+/* ---------- MODAL ---------- */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(6px);
+    background: rgba(0, 0, 0, 0.4);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    width: 90%;
+    max-width: 900px;
+    padding: 20px;
+    border-radius: 12px;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+}
+
+.close-btn:hover {
+    color: red;
+}
+
+.modal-body {
+    display: flex;
+    gap: 30px;
+    align-items:flex-start;
+}
+
+.modal-left img {
+    width: 150px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #ccc;
+}
+
+.modal-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/*table*/
+.navbar {
+    margin-top: 10px;
+}
+
+.navbar ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 0;
+}
+
+.navbar ul li {
+    display: inline;
+}
+
+.navbar ul li a {
+    text-decoration: none;
+    padding: 10px 15px;
+    background: #0066cc;
+    color: white;
+    border-radius: 8px;
+    transition: background 0.3s;
+}
+
+.navbar ul li a:hover {
+    background: #004080;
+}
+
+
+/* ======================
+   Capture Page Styling
+   ====================== */
+.capture-page {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    background: #f4f7fb;
+    padding: 40px 0;
+    font-family: Arial, sans-serif;
+}
+
+.capture-page .overlay {
+    background: #fff;
+    padding: 30px 40px;
+    border-radius: 16px;
+    width: 1000px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    position: relative;
+}
+
+/* Title */
+.capture-page h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #1976d2;
+    font-size: 30px;
+}
+
+/* Close button */
+.capture-page .top-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    cursor: pointer;
+    font-size: 20px;
+    color: #e53935;
+    transition: 0.2s;
+}
+.capture-page .top-close:hover {
+    color: #b71c1c;
+}
+
+/* Flex container for camera + form */
+/* Flex container for camera + form */
+.capture-page .overlay > div {
+    display: flex;
+    gap: 40px;              /* adjust spacing */
+    align-items: flex-start;
+    justify-content: flex-start;  /* prevent inputs from going to far right */
+}
+
+/* Right-side form section */
+.capture-page .overlay > div > div:last-child {
+    flex: 1;
+    max-width: 400px;  /* keeps inputs neat */
+}
+
+.capture-page .camera-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+/* Camera section */
+.capture-page video,
+.capture-page canvas {
+    width: 400px !important;
+    height: 300px !important;
+    border: 3px solid #1976d2;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+
+/* Form section */
+.capture-page label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 4px;
+    font-size: 14px;
+    color: #333;
+}
+
+.capture-page input[type="text"],
+.capture-page input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px; /* tighter spacing */
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.capture-page input[type="text"]:focus,
+.capture-page input[type="file"]:focus {
+    outline: none;
+    border-color: #1976d2;
+    box-shadow: 0 0 4px rgba(25, 118, 210, 0.4);
+}
+
+/* Buttons */
+.capture-page .actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 8px;
+}
+
+.capture-page .actions button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* Capture button */
+.capture-page .capture-btn {
+    background: #1976d2;
+    color: #fff;
+}
+.capture-page .capture-btn:hover {
+    background: #125ca1;
+}
+
+/* Save button */
+.capture-page .save-btn {
+    background: #2e7d32;
+    color: #fff;
+}
+.capture-page .save-btn:hover {
+    background: #1b5e20;
+}
+.hidden {
+    display: none !important;
+}
+/* Ensure video and canvas always take the same space */
+.capture-page .camera-container video,
+.capture-page .camera-container canvas {
+    width: 400px !important;
+    height: 300px !important;
+    border: 3px solid #1976d2;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    display: block;
+}
+
+
+
+
+
+
+
+/*faculty_data.html*/
+/* ======================
+   Faculty Database Page
+   ====================== */
+
+.faculty-data-container {
+    padding: 20px;
+}
+
+/* --- Header with search + buttons --- */
+.faculty-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 350px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+/* Search box */
+#searchBox {
+    padding: 10px 14px;
+    width: 320px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+}
+
+#searchBox:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 6px rgba(0,123,255,0.5);
+    outline: none;
+}
+
+/* Buttons */
+#addFacultyBtn,
+#saveChangesBtn {
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* Add Faculty Button */
+#addFacultyBtn {
+    background: #28a745; /* green */
+    color: white;
+}
+
+#addFacultyBtn:hover {
+    background: #218838;
+    transform: translateY(-1px);
+}
+
+/* Save Changes Button */
+#saveChangesBtn {
+    background: #007bff; /* blue */
+    color: white;
+}
+
+#saveChangesBtn:hover {
+    background: #0056b3;
+    transform: translateY(-1px);
+}
+
+/* --- Faculty Table --- */
+#facultyTable {
+    width: 90%;
+    border-collapse: collapse;
+    margin: 0 auto;
+    font-size: 16px;
+    background: white;
+    box-shadow: 0 0 10px #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#facultyTable th, 
+#facultyTable td {
+    padding: 16px;
+    border: 1px solid #dbdbdb;
+    text-align: center;
+}
+
+/* Same dark blue header */
+#facultyTable th {
+    background-color: #004080;
+    color: white;
+    font-size: 18px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#facultyTable td input[type="text"] {
+    width: 90%;
+    padding: 8px 10px;
+    border: 1px solid #a5a5a5;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* Faculty photo */
+.faculty-photo {
+    width: 100px;
+    height: 120px;
+    border-radius: 5px;
+    object-fit: cover;
+    border: 1px solid #ccc;
+}
+
+/* Delete button inside table */
+.delete-btn {
+    background: #dc3545; /* red */
+    color: white;
+    border: none;
+    padding: 8px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.delete-btn:hover {
+    background: #b02a37;
+    transform: scale(1.05);
+    
+}
+
+
+
+/* ----------- TIMETABLE TABLES (for timetable.html) ----------- */
+.timetable-table {
+    margin: 20px auto;
+    border-collapse: collapse;
+    width: 90%;
+    background: white;
+}
+
+.timetable-table th, .timetable-table td {
+    border: 1px solid #ddd;
+    padding: 14px 16px;
+    text-align: center;
+}
+
+.timetable-table th {
+    background-color:#004080; /* dark blue header */
+    color: white;
+    font-size: 18px;
+}
+
+.timetable-table td {
+    font-size: 14px;
+}

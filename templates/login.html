@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Smart Classroom</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #0d47a1, #1976d2);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-container {
+            background: white;
+            padding: 40px;
+            width: 350px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .login-container h2 {
+            margin-bottom: 20px;
+            color: #0d47a1;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .input-group label {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #1976d2;
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .login-btn:hover {
+            background-color: #2892ee;
+        }
+
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+
+        .logo {
+            margin-bottom: 15px;
+        }
+
+        .logo img {
+            width: 200px;
+            height:auto;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="login-container">
+
+    <!-- Optional Logo -->
+    <div class="logo">
+        <img src="{{ url_for('static', filename='college logo.jpg') }}">
+    </div>
+
+    <h2>Smart Classroom Login</h2>
+
+    <form method="POST">
+        <div class="input-group">
+            <label>Username</label>
+            <input type="text" name="username" required>
+        </div>
+
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" name="password" required>
+        </div>
+
+        <button type="submit" class="login-btn">Login</button>
+    </form>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="error">
+                {{ messages[0] }}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+</div>
+
+</body>
+</html>

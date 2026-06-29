@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+    {% for room in classrooms %}
+    <div class="class-card">
+        <div class="class-info">
+            <h2>{{ room.room }}</h2>
+            <p>{{ room.name or 'No faculty detected' }}</p>
+        </div>
+
+        <div class="class-actions">
+            <button class="view-btn"
+                    data-room="{{ room.room }}"
+                    data-name="{{ room.name }}"
+                    data-phone="{{ room.phone }}"
+                    data-subject="{{ room.subject }}"
+                    data-photo="{{ room.photo }}"
+                    data-status="{{ room.status }}">
+                View Details
+            </button>
+        </div>
+        
+        <div class="circle {{ 'green' if room.status == 'Present' else 'red' }}"></div>
+    </div>
+    {% endfor %}
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2 id="modal-room"></h2>
+            <div class="modal-body">
+                <div class="modal-left">
+                    <img id="modal-photo" src="" alt="Faculty Photo">
+                </div>
+                <div class="modal-right">
+                    <p><strong>Name:</strong> <span id="modal-name"></span></p>
+                    <p><strong>Phone:</strong> <span id="modal-phone"></span></p>
+                    <p><strong>Subject:</strong> <span id="modal-subject"></span></p>
+                    <p><strong>Status:</strong> <span id="modal-status"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById("modal");
+        const closeBtn = document.querySelector(".close-btn");
+
+        document.querySelectorAll(".view-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.getElementById("modal-room").textContent = btn.dataset.room;
+                document.getElementById("modal-name").textContent = btn.dataset.name || "No details";
+                document.getElementById("modal-phone").textContent = btn.dataset.phone || "-";
+                document.getElementById("modal-subject").textContent = btn.dataset.subject || "-";
+                document.getElementById("modal-status").textContent = btn.dataset.status;
+                document.getElementById("modal-photo").src = btn.dataset.photo;
+
+                modal.style.display = "flex";
+            });
+        });
+
+        closeBtn.addEventListener("click", () => {
+            modal.style.display = "none";
+        });
+
+        window.addEventListener("click", (e) => {
+            if (e.target === modal) {
+                modal.style.display = "none";
+            }
+        });
+    </script>
+{% endblock %}

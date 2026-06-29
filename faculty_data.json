@@ -1,0 +1,26 @@
+{
+    "512": {
+        "name": "Ms.Ch.Varshitha",
+        "phone": "8019880569",
+        "subject": "MAD",
+        "image": "512.jpg"
+    },
+    "541": {
+        "name": "Ms.P.Jasmine",
+        "phone": "9059786502",
+        "subject": "DL",
+        "image": "541.jpg"
+    },
+    "530": {
+        "name": "Ms.M.Divya Sri",
+        "phone": "8328271072",
+        "subject": "SS",
+        "image": "530.jpg"
+    },
+    "516": {
+        "name": "Ms.E.Tejaswani",
+        "phone": "8639015944",
+        "subject": "CS",
+        "image": "516.jpg"
+    }
+}

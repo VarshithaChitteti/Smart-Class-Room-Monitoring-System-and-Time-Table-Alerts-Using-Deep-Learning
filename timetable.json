@@ -1,0 +1,350 @@
+{
+  "Monday": [
+    {
+      "faculty_name": "Ms.Ch.Varshitha",
+      "subject": "MAD",
+      "start_time": "09:00",
+      "end_time": "09:50",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Mrs.P.Madhavi",
+      "subject": "OOAD",
+      "start_time": "09:50",
+      "end_time": "10:40",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.P.Jasmine",
+      "subject": "DL",
+      "start_time": "11:00",
+      "end_time": "11:50",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.E.Tejaswani",
+      "subject": "CS",
+      "start_time": "11:50",
+      "end_time": "12:40",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.M.DivyaSri",
+      "subject": "SS",
+      "start_time": "13:20",
+      "end_time": "14:10",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Mr.P.Muthyalu",
+      "subject": "CNS",
+      "start_time": "14:10",
+      "end_time": "15:00",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.Ch.Varshitha",
+      "subject": "MAD LAB",
+      "start_time": "18:35",
+      "end_time": "18:50",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.P.Jasmine",
+      "subject": "DL LAB",
+      "start_time": "16:00",
+      "end_time": "16:40",
+      "phone": "+918019880569"
+    }
+  ],
+  "Tuesday": [
+    {
+      "faculty_name": "Mrs.P.Madhavi",
+      "subject": "OOAD",
+      "start_time": "09:00",
+      "end_time": "09:50",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.Ch.Varshitha",
+      "subject": "MAD",
+      "start_time": "09:50",
+      "end_time": "10:40",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.M.DivyaSri",
+      "subject": "SS",
+      "start_time": "11:00",
+      "end_time": "11:50",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.P.Jasmine",
+      "subject": "DL",
+      "start_time": "11:50",
+      "end_time": "12:40",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.E.Tejaswani",
+      "subject": "CS",
+      "start_time": "13:20",
+      "end_time": "14:10",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.Ch.Varshitha",
+      "subject": "MAD LAB",
+      "start_time": "14:10",
+      "end_time": "15:00",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.P.Jasmine",
+      "subject": "DL LAB",
+      "start_time": "15:00",
+      "end_time": "15:50",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Mr.P.Muthyalu",
+      "subject": "CNS",
+      "start_time": "16:00",
+      "end_time": "16:40",
+      "phone": "+918019880569"
+    }
+  ],
+  "Wednesday": [
+    {
+      "faculty_name": "Ms.Ch.Varshitha",
+      "subject": "MAD LAB",
+      "start_time": "09:00",
+      "end_time": "09:50",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.Ch.Varshitha",
+      "subject": "MAD",
+      "start_time": "09:50",
+      "end_time": "10:40",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Mrs.P.Madhavi",
+      "subject": "OOAD",
+      "start_time": "11:00",
+      "end_time": "11:50",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.E.Tejaswani",
+      "subject": "CS",
+      "start_time": "11:50",
+      "end_time": "12:40",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Mr.P.Muthyalu",
+      "subject": "CNS",
+      "start_time": "13:20",
+      "end_time": "14:10",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.P.Jasmine",
+      "subject": "DL LAB",
+      "start_time": "14:10",
+      "end_time": "15:00",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.M.DivyaSri",
+      "subject": "SS",
+      "start_time": "15:00",
+      "end_time": "15:50",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.P.Jasmine",
+      "subject": "DL",
+      "start_time": "16:00",
+      "end_time": "16:40",
+      "phone": "+918019880569"
+    }
+  ],
+  "Thursday": [
+    {
+      "faculty_name": "Mrs.P.Madhavi",
+      "subject": "OOAD",
+      "start_time": "09:00",
+      "end_time": "09:50",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.Ch.Varshitha",
+      "subject": "MAD",
+      "start_time": "09:50",
+      "end_time": "10:40",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.M.DivyaSri",
+      "subject": "SS",
+      "start_time": "11:00",
+      "end_time": "11:50",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.Ch.Varshitha",
+      "subject": "MAD LAB",
+      "start_time": "12:36",
+      "end_time": "12:45",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.E.Tejaswani",
+      "subject": "CS",
+      "start_time": "13:20",
+      "end_time": "14:10",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Mr.P.Muthyalu",
+      "subject": "CNS",
+      "start_time": "14:10",
+      "end_time": "15:00",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.P.Jasmine",
+      "subject": "DL LAB",
+      "start_time": "15:00",
+      "end_time": "15:50",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.P.Jasmine",
+      "subject": "DL",
+      "start_time": "16:00",
+      "end_time": "16:40",
+      "phone": "+918019880569"
+    }
+  ],
+  "Friday": [
+    {
+      "faculty_name": "Ms.Ch.Varshitha",
+      "subject": "MAD",
+      "start_time": "09:00",
+      "end_time": "09:50",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Mrs.P.Madhavi",
+      "subject": "OOAD",
+      "start_time": "09:50",
+      "end_time": "10:40",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.E.Tejaswani",
+      "subject": "CS",
+      "start_time": "11:00",
+      "end_time": "11:50",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.P.Jasmine",
+      "subject": "DL",
+      "start_time": "11:50",
+      "end_time": "12:40",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.Ch.Varshitha",
+      "subject": "MAD LAB",
+      "start_time": "13:20",
+      "end_time": "14:10",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.M.DivyaSri",
+      "subject": "SS",
+      "start_time": "14:50",
+      "end_time": "15:00",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.P.Jasmine",
+      "subject": "DL LAB",
+      "start_time": "15:00",
+      "end_time": "15:50",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Mr.P.Muthyalu",
+      "subject": "CNS",
+      "start_time": "16:00",
+      "end_time": "16:40",
+      "phone": "+918019880569"
+    }
+  ],
+  "Saturday": [
+    {
+      "faculty_name": "Mrs.P.Madhavi",
+      "subject": "OOAD",
+      "start_time": "09:00",
+      "end_time": "09:50",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.Ch.Varshitha",
+      "subject": "MAD",
+      "start_time": "09:50",
+      "end_time": "10:40",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.M.DivyaSri",
+      "subject": "SS",
+      "start_time": "11:00",
+      "end_time": "11:50",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.P.Jasmine",
+      "subject": "DL",
+      "start_time": "11:50",
+      "end_time": "12:40",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.E.Tejaswani",
+      "subject": "CS",
+      "start_time": "13:20",
+      "end_time": "14:10",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.Ch.Varshitha",
+      "subject": "MAD LAB",
+      "start_time": "14:30",
+      "end_time": "15:00",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Ms.P.Jasmine",
+      "subject": "DL LAB",
+      "start_time": "15:00",
+      "end_time": "15:50",
+      "phone": "+918019880569"
+    },
+    {
+      "faculty_name": "Mr.P.Muthyalu",
+      "subject": "CNS",
+      "start_time": "16:00",
+      "end_time": "16:40",
+      "phone": "+918019880569"
+    }
+  ]
+}
